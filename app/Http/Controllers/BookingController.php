@@ -159,11 +159,53 @@ class BookingController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Booking $booking)
+    private function getBookingsByStatus($status, $successMessage)
     {
-        //
+        $bookings = Booking::where('status', $status)->get();
+
+        if ($bookings->isEmpty()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No bookings found',
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => $bookings,
+            'status' => 'success',
+            'message' => $successMessage,
+        ], 200);
     }
+
+    public function bookingConfirmed()
+    {
+        return $this->getBookingsByStatus('confirmed', 'Confirmed bookings found successfully');
+    }
+
+    public function bookingPending()
+    {
+        // return $this->getBookingsByStatus('pending', 'Pending bookings found successfully');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Testing',
+        ], 200);
+    }
+
+    public function bookingCompleted()
+    {
+        return $this->getBookingsByStatus('completed', 'Completed bookings found successfully');
+    }
+
+    public function bookingCancelled()
+    {
+        return $this->getBookingsByStatus('cancelled', 'Cancelled bookings found successfully');
+    }
+
+    public function destroy($id)
+    {
+
+    }
+
+
+
 }

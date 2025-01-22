@@ -176,8 +176,6 @@ class UserController extends Controller
 
     }
 
-
-
     public function passwordReset(){
 
         $user = User::findOrFail(auth()->user()->id);
@@ -227,6 +225,5 @@ class UserController extends Controller
         }
 
     }
-
 
 }

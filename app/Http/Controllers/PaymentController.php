@@ -4,62 +4,156 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Validator;
 
 class PaymentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        //
+        $payments = Payment::get();
+
+        if($payments->isEmpty()){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No payments found',
+            ],404);
+        }
+
+        return response()->json([
+            'data' => $payments,
+            'status' => 'success',
+            'message' => 'Payments found successfully',
+        ],200);
+
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function paymentById($id){
+
+        $payment = Payment::where('id',$id)->get();
+
+        if($payment->isEmpty()){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No payment found',
+            ],404);
+        }
+
+        return response()->json([
+            'data' => $payment,
+            'status' => 'success',
+            'message' => 'Payment found successfully',
+        ],200);
+
+    }
+
+
     public function create()
     {
-        //
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Payment $payment)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Payment $payment)
+    public function edit($id)
     {
-        //
+        $payments = Payment::where('id',$id)->get();
+
+        if($payments->isEmpty()){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No payments found',
+            ],404);
+        }
+
+        return response()->json([
+            'data' => $payments,
+            'status' => 'success',
+            'message' => 'Payments found successfully',
+        ],200);
+
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Payment $payment)
     {
-        //
+
+        $validated = Validator::make($request->all(),[
+            'payment_id' => 'required|numeric',
+            'booking_id' => 'required|numeric',
+            'payment_method' => 'required|string',
+            'amount' => 'required|numeric',
+            'transaction_id' => 'required|string',
+            'is_verified' => 'required|boolean',
+        ]);
+
+
+        if($validated->fails()){
+            return response()->json([
+                'status' => 'error',
+                'message' => $validated->errors(),
+            ],400);
+        }
+
+        $payment = Payment::find($request->payment_id);
+
+        if(!$payment){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment not found',
+            ],404);
+        }
+
+        $payment->booking_id = $request->booking_id;
+        $payment->payment_method = $request->payment_method;
+        $payment->amount = $request->amount;
+        $payment->transaction_id = $request->transaction_id;
+        $payment->is_verified = $request->is_verified;
+        $payment->updated_at = now();
+        $payment->save();
+
+        return response()->json([
+            'data' => $payment,
+            'status' => 'success',
+            'message' => 'Payment updated successfully',
+        ],200);
+
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Payment $payment)
+    public function destroy($id)
     {
-        //
+
+        $payment = Payment::find($id);
+
+        if(!$payment){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Payment not found',
+            ],404);
+        }
+
+        if($payment->is_verified == true){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'You cannot delete it. Because Payment is verified',
+            ],400);
+        }
+
+        $payment->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Payment deleted successfully',
+        ],200);
+
     }
+
+
 }

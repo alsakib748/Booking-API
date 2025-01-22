@@ -2,10 +2,11 @@
 
 namespace App\Notifications;
 
+use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
 
 class BookingCompleted extends Notification
 {
@@ -38,8 +39,8 @@ class BookingCompleted extends Notification
     {
         return (new MailMessage)
                     ->greeting('Hello '.$notifiable->name.' !')
-                    ->line('Booking Confirmed!')
-                    ->line('Your booking has been confirmed.')
+                    ->line('Booking '.Str::ucfirst($this->booking->status).' !')
+                    ->line('Your booking has been '.$this->booking->status.'.')
                     ->line('Booking Details:')
                     ->line('Listing: '.$this->booking->listing->title)
                     ->line('Date: '.$this->booking->check_in.' to '.$this->booking->check_out)

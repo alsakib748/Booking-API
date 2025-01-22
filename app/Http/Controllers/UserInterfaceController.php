@@ -216,7 +216,7 @@ class UserInterfaceController extends Controller
                 'payment_method' => $request->payment_method,
                 'amount' => $total_price,
                 'transaction_id' => 'TXN'.rand(100000,999999),
-                'is_verified' => $request->is_verified,
+                'is_verified' => 0,
             ]);
 
             $notification = Notification::create([
